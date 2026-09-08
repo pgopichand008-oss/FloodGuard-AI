@@ -1,0 +1,45 @@
+{
+    "location": "Demo Urban Area",
+    "timestamp": "2026-09-08T23:30:00",
+    "rainfall": {
+        "current_mm_per_hr": 86,
+        "peak_mm_per_hr": 102,
+        "trend": "increasing"
+    },
+    "flood": {
+        "risk": "HIGH",
+        "peak_depth_cm": 47,
+        "affected_roads": 12,
+        "critical_drainage_nodes": 4
+    },
+    "forecast": [
+        {
+            "minutes": 0,
+            "depth_cm": 18
+        },
+        {
+            "minutes": 30,
+            "depth_cm": 27
+        },
+        {
+            "minutes": 60,
+            "depth_cm": 35
+        },
+        {
+            "minutes": 90,
+            "depth_cm": 42
+        },
+        {
+            "minutes": 120,
+            "depth_cm": 47
+        },
+        {
+            "minutes": 150,
+            "depth_cm": 43
+        },
+        {
+            "minutes": 180,
+            "depth_cm": 38
+        }
+    ]
+}
