@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.api import health, flood, rainfall, terrain, drainage, ml
+from backend.api import health, flood, rainfall, terrain, drainage, ml, explanations
 
 app = FastAPI(
     title="FloodGuard AI",
@@ -25,6 +25,7 @@ app.include_router(rainfall.router, prefix="/api")
 app.include_router(terrain.router, prefix="/api")
 app.include_router(drainage.router, prefix="/api")
 app.include_router(ml.router, prefix="/api")
+app.include_router(explanations.router, prefix="/api")
 
 
 @app.get("/")
