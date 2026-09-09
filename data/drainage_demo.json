@@ -1,0 +1,134 @@
+{
+  "location": "Demo Urban Area",
+  "data_type": "DEMO-SIMULATED",
+  "source_note": "Synthetic urban drainage network model for prototype demonstration. Not municipal utility survey data.",
+  "limitation_note": "Prototype drainage-capacity model. Surcharge is evaluated via flow vs. effective capacity thresholding; not a complete 2D hydrodynamic backflow simulation.",
+  "generated_at": "2026-09-09T13:00:00Z",
+  "nodes": [
+    {
+      "node_id": "N01",
+      "name": "Riverbank Lane Inlet",
+      "latitude": 17.3850,
+      "longitude": 78.4860,
+      "elevation_m": 11.2,
+      "type": "inlet",
+      "associated_zone_id": "Z05"
+    },
+    {
+      "node_id": "N02",
+      "name": "Station Road Trunk Manhole",
+      "latitude": 17.3880,
+      "longitude": 78.4890,
+      "elevation_m": 12.4,
+      "type": "manhole",
+      "associated_zone_id": "Z01"
+    },
+    {
+      "node_id": "N03",
+      "name": "Hospital Access Junction",
+      "latitude": 17.3910,
+      "longitude": 78.4910,
+      "elevation_m": 13.1,
+      "type": "junction",
+      "associated_zone_id": "Z04"
+    },
+    {
+      "node_id": "N04",
+      "name": "Market Junction Manhole",
+      "latitude": 17.3940,
+      "longitude": 78.4930,
+      "elevation_m": 13.8,
+      "type": "manhole",
+      "associated_zone_id": "Z02"
+    },
+    {
+      "node_id": "N05",
+      "name": "Bus Route Corridor Inlet",
+      "latitude": 17.3960,
+      "longitude": 78.4900,
+      "elevation_m": 14.5,
+      "type": "inlet",
+      "associated_zone_id": "Z08"
+    },
+    {
+      "node_id": "N06",
+      "name": "Central Canal Main Outfall",
+      "latitude": 17.3820,
+      "longitude": 78.4830,
+      "elevation_m": 9.8,
+      "type": "outfall",
+      "associated_zone_id": null
+    },
+    {
+      "node_id": "N07",
+      "name": "Main Street Upper Junction",
+      "latitude": 17.3980,
+      "longitude": 78.4960,
+      "elevation_m": 18.2,
+      "type": "junction",
+      "associated_zone_id": "Z03"
+    }
+  ],
+  "edges": [
+    {
+      "edge_id": "E01",
+      "from_node": "N07",
+      "to_node": "N04",
+      "street_name": "Main Street",
+      "capacity_m3s": 3.5,
+      "current_flow_m3s": 2.1,
+      "blockage_percent": 10.0,
+      "length_m": 180.0
+    },
+    {
+      "edge_id": "E02",
+      "from_node": "N04",
+      "to_node": "N03",
+      "street_name": "Market Junction",
+      "capacity_m3s": 4.0,
+      "current_flow_m3s": 3.4,
+      "blockage_percent": 15.0,
+      "length_m": 220.0
+    },
+    {
+      "edge_id": "E03",
+      "from_node": "N03",
+      "to_node": "N02",
+      "street_name": "Hospital Access Road",
+      "capacity_m3s": 4.5,
+      "current_flow_m3s": 4.2,
+      "blockage_percent": 30.0,
+      "length_m": 250.0
+    },
+    {
+      "edge_id": "E04",
+      "from_node": "N05",
+      "to_node": "N02",
+      "street_name": "Bus Route Corridor",
+      "capacity_m3s": 2.5,
+      "current_flow_m3s": 1.5,
+      "blockage_percent": 5.0,
+      "length_m": 190.0
+    },
+    {
+      "edge_id": "E05",
+      "from_node": "N01",
+      "to_node": "N06",
+      "street_name": "Riverbank Lane",
+      "capacity_m3s": 5.0,
+      "current_flow_m3s": 3.2,
+      "blockage_percent": 0.0,
+      "length_m": 310.0
+    },
+    {
+      "edge_id": "E06",
+      "from_node": "N02",
+      "to_node": "N06",
+      "street_name": "Station Road Trunk",
+      "capacity_m3s": 6.0,
+      "current_flow_m3s": 5.8,
+      "blockage_percent": 10.0,
+      "length_m": 340.0
+    }
+  ]
+}
