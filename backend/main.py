@@ -1,6 +1,7 @@
 from fastapi import FastAPI
-import json
-from pathlib import Path
+from fastapi.middleware.cors import CORSMiddleware
+
+from backend.api import health, flood
 
 app = FastAPI(
     title="FloodGuard AI",
@@ -8,21 +9,26 @@ app = FastAPI(
     version="0.1.0"
 )
 
+# Enable CORS for frontend integration (Vite dev server default: localhost:5173)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@app.get("/api/health")
-def health_check():
+# Register modular routers under /api prefix
+app.include_router(health.router, prefix="/api")
+app.include_router(flood.router, prefix="/api")
+
+
+@app.get("/")
+def root():
+    """Root metadata endpoint."""
     return {
-        "status": "ok",
-        "message": "FloodGuard backend is running",
-        "version": "0.1.0"
+        "name": "FloodGuard AI API",
+        "status": "online",
+        "version": "0.1.0",
+        "docs_url": "/docs"
     }
-
-
-@app.get("/api/flood")
-def get_flood_data():
-    data_path = Path(__file__).parent.parent / "data" / "flood_data.json"
-
-    with open(data_path, "r") as file:
-        data = json.load(file)
-
-    return data
