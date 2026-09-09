@@ -1,0 +1,96 @@
+{
+  "location": "Demo Urban Area",
+  "data_type": "DEMO-SIMULATED",
+  "source_note": "Synthetic digital elevation model (DEM) and catchment characteristics for prototype demonstration. Not municipal survey or GIS data.",
+  "generated_at": "2026-09-09T12:00:00Z",
+  "zones": [
+    {
+      "zone_id": "Z01",
+      "name": "Station Road",
+      "elevation_m": 12.4,
+      "slope_percent": 0.5,
+      "flow_accumulation": 1850,
+      "imperviousness": 0.92,
+      "area_hectares": 3.5,
+      "is_low_lying": true,
+      "soil_type": "Compacted Urban / Paved"
+    },
+    {
+      "zone_id": "Z02",
+      "name": "Market Junction",
+      "elevation_m": 13.8,
+      "slope_percent": 0.8,
+      "flow_accumulation": 1420,
+      "imperviousness": 0.88,
+      "area_hectares": 4.2,
+      "is_low_lying": true,
+      "soil_type": "Commercial Impermeable"
+    },
+    {
+      "zone_id": "Z03",
+      "name": "Main Street",
+      "elevation_m": 18.2,
+      "slope_percent": 2.1,
+      "flow_accumulation": 650,
+      "imperviousness": 0.82,
+      "area_hectares": 5.0,
+      "is_low_lying": false,
+      "soil_type": "Asphalt Corridor"
+    },
+    {
+      "zone_id": "Z04",
+      "name": "Hospital Access Road",
+      "elevation_m": 13.1,
+      "slope_percent": 0.7,
+      "flow_accumulation": 1200,
+      "imperviousness": 0.89,
+      "area_hectares": 2.8,
+      "is_low_lying": true,
+      "soil_type": "Critical Access Paved"
+    },
+    {
+      "zone_id": "Z05",
+      "name": "Riverbank Lane",
+      "elevation_m": 11.2,
+      "slope_percent": 0.4,
+      "flow_accumulation": 2400,
+      "imperviousness": 0.78,
+      "area_hectares": 3.0,
+      "is_low_lying": true,
+      "soil_type": "Alluvial Lowland"
+    },
+    {
+      "zone_id": "Z06",
+      "name": "Hilltop Avenue",
+      "elevation_m": 38.5,
+      "slope_percent": 6.2,
+      "flow_accumulation": 120,
+      "imperviousness": 0.60,
+      "area_hectares": 6.5,
+      "is_low_lying": false,
+      "soil_type": "Residual Elevated Soil"
+    },
+    {
+      "zone_id": "Z07",
+      "name": "Central Park Sector",
+      "elevation_m": 20.0,
+      "slope_percent": 1.5,
+      "flow_accumulation": 350,
+      "imperviousness": 0.18,
+      "area_hectares": 8.0,
+      "is_low_lying": false,
+      "soil_type": "Vegetated Permeable Turf"
+    },
+    {
+      "zone_id": "Z08",
+      "name": "Bus Route Corridor",
+      "elevation_m": 14.5,
+      "slope_percent": 1.0,
+      "flow_accumulation": 1150,
+      "imperviousness": 0.86,
+      "area_hectares": 4.0,
+      "is_low_lying": true,
+      "soil_type": "Transit Arterial"
+    }
+  ]
+}
