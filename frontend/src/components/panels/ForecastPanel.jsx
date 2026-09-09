@@ -12,13 +12,27 @@ export default function ForecastPanel({ onClose }) {
     async function loadForecast() {
       setLoading(true);
       const res = await fetchForecastData(180);
-      setData(res.data);
+      if (res.data) {
+        setData(res.data);
+      }
       setLoading(false);
     }
     loadForecast();
   }, []);
 
-  const chartData = data?.time_series || [
+  const rawSeries = data?.forecast_series || data?.time_series;
+
+  const chartData = rawSeries ? rawSeries.map(pt => {
+    const minutes = pt.offset_minutes !== undefined ? pt.offset_minutes : (pt.minutes || 0);
+    const rainfall = pt.intensity_mm_per_hr !== undefined ? pt.intensity_mm_per_hr : (pt.rainfall_mm_hr || 0);
+    const depth = pt.depth_cm !== undefined ? pt.depth_cm : Math.round((rainfall * 0.45) * 10) / 10;
+    return {
+      minutes,
+      time: minutes === 0 ? "NOW" : `+${minutes}m`,
+      rainfall_mm_hr: rainfall,
+      depth_cm: depth
+    };
+  }) : [
     { minutes: 0, time: "NOW", rainfall_mm_hr: 86.4, depth_cm: 18.0 },
     { minutes: 30, time: "+30m", rainfall_mm_hr: 94.0, depth_cm: 27.5 },
     { minutes: 60, time: "+60m", rainfall_mm_hr: 101.2, depth_cm: 36.0 },
@@ -27,6 +41,9 @@ export default function ForecastPanel({ onClose }) {
     { minutes: 150, time: "+150m", rainfall_mm_hr: 54.0, depth_cm: 32.0 },
     { minutes: 180, time: "+180m", rainfall_mm_hr: 28.0, depth_cm: 21.0 }
   ];
+
+  const peakRate = data?.peak_forecast_intensity_mm_per_hr ?? data?.peak_forecast_intensity_mm_hr ?? 105.0;
+  const peakMinutes = data?.peak_forecast_offset_minutes ?? data?.peak_arrival_minutes ?? 90;
 
   return (
     <div className="workspace-overlay-backdrop" onClick={onClose}>
@@ -41,17 +58,17 @@ export default function ForecastPanel({ onClose }) {
 
         <div className="workspace-body">
           {loading ? (
-            <LoadingState message="Generating 0-3 hour nowcast forecast..." />
+            <LoadingState message="Fetching live 0-3 hour nowcast forecast from GET /api/forecast..." />
           ) : (
             <>
               <div className="forecast-summary-bar">
                 <div className="summary-item">
                   <span className="lbl">Peak Forecast Rate</span>
-                  <span className="val" style={{ color: 'var(--cyan-bright)' }}>{data?.peak_forecast_intensity_mm_hr || 105.0} mm/hr</span>
+                  <span className="val" style={{ color: 'var(--cyan-bright)' }}>{peakRate} mm/hr</span>
                 </div>
                 <div className="summary-item">
                   <span className="lbl">Peak Arrival Time</span>
-                  <span className="val" style={{ color: 'var(--amber-bright)' }}>+{data?.peak_arrival_minutes || 90} mins</span>
+                  <span className="val" style={{ color: 'var(--amber-bright)' }}>+{peakMinutes} mins</span>
                 </div>
                 <div className="summary-item">
                   <span className="lbl">Peak Surge Depth</span>
@@ -62,7 +79,7 @@ export default function ForecastPanel({ onClose }) {
               <div className="recharts-container-box">
                 <div className="chart-header-row">
                   <span>PRECIPITATION (mm/hr) vs INUNDATION DEPTH (cm)</span>
-                  <span>180-MINUTE HORIZON</span>
+                  <span>{data?.forecast_horizon_minutes || 180}-MINUTE HORIZON</span>
                 </div>
                 <div style={{ width: '100%', height: 260 }}>
                   <ResponsiveContainer width="100%" height="100%">

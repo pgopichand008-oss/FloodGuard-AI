@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import {
-  Layers,
+  Map,
   CloudRain,
   Network,
   HelpCircle,
   Route,
   Sliders,
+  AlertTriangle,
+  Radio,
   Bell,
+  Settings,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
@@ -15,21 +18,19 @@ export default function LeftToolRail({ activeWorkspace, setActiveWorkspace }) {
   const [collapsed, setCollapsed] = useState(false);
 
   const tools = [
-    { id: 'layers', label: 'GIS Layers', icon: Layers, group: 'VIEWPORT' },
-    { id: 'forecast', label: 'Rain Nowcast', icon: CloudRain, group: 'HYDROLOGY' },
-    { id: 'drainage', label: 'Drainage Net', icon: Network, group: 'HYDROLOGY' },
-    { id: 'analysis', label: 'WHY-FLOOD', icon: HelpCircle, group: 'INTELLIGENCE' },
-    { id: 'routing', label: 'Safe Routing', icon: Route, group: 'INTELLIGENCE' },
-    { id: 'whatif', label: 'WHAT-IF Sim', icon: Sliders, group: 'INTELLIGENCE' },
-    { id: 'alerts', label: 'Alert Feed', icon: Bell, group: 'OPERATIONS', badge: 2 }
+    { id: null, label: 'Map', icon: Map },
+    { id: 'forecast', label: 'Forecast', icon: CloudRain },
+    { id: 'drainage', label: 'Drainage', icon: Network },
+    { id: 'analysis', label: 'Analysis', icon: HelpCircle },
+    { id: 'routing', label: 'Routing', icon: Route },
+    { id: 'whatif', label: 'What-If', icon: Sliders },
+    { id: 'alerts', label: 'Priority', icon: AlertTriangle },
+    { id: 'propagation', label: 'Propagation', icon: Radio },
+    { id: 'feed', label: 'Alerts', icon: Bell, badge: 3 }
   ];
 
   const handleToolClick = (toolId) => {
-    if (activeWorkspace === toolId) {
-      setActiveWorkspace(null); // toggle off
-    } else {
-      setActiveWorkspace(toolId);
-    }
+    setActiveWorkspace(toolId);
   };
 
   return (
@@ -38,10 +39,10 @@ export default function LeftToolRail({ activeWorkspace, setActiveWorkspace }) {
         <button
           className="rail-toggle-btn"
           onClick={() => setCollapsed(!collapsed)}
-          title={collapsed ? "Expand Tools" : "Collapse Tools"}
+          title={collapsed ? "Expand Tool Rail" : "Collapse Tool Rail"}
         >
           {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-          {!collapsed && <span className="rail-header-title">TOOLS</span>}
+          {!collapsed && <span className="rail-header-title">NAVIGATION</span>}
         </button>
       </div>
 
@@ -50,10 +51,10 @@ export default function LeftToolRail({ activeWorkspace, setActiveWorkspace }) {
           <div className="rail-group-items">
             {tools.map((tool) => {
               const Icon = tool.icon;
-              const isActive = activeWorkspace === tool.id;
+              const isActive = activeWorkspace === tool.id || (tool.id === null && !activeWorkspace);
               return (
                 <button
-                  key={tool.id}
+                  key={tool.label}
                   className={`rail-btn ${isActive ? 'active' : ''}`}
                   onClick={() => handleToolClick(tool.id)}
                 >
@@ -68,6 +69,20 @@ export default function LeftToolRail({ activeWorkspace, setActiveWorkspace }) {
             })}
           </div>
         </div>
+      </div>
+
+      <div className="rail-footer" style={{ padding: '8px', borderTop: '1px solid var(--border)' }}>
+        <button
+          className="rail-btn"
+          onClick={() => setActiveWorkspace(null)}
+          title="Settings"
+        >
+          <div className="rail-btn-icon">
+            <Settings size={16} />
+          </div>
+          {!collapsed && <span className="rail-label">Settings</span>}
+          {collapsed && <div className="rail-tooltip">Settings</div>}
+        </button>
       </div>
     </aside>
   );

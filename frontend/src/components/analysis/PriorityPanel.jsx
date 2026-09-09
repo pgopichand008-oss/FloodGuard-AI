@@ -20,12 +20,12 @@ export default function PriorityPanel({ onSelectZone }) {
 
   if (loading) return <LoadingState message="Ranking emergency intervention priorities..." />;
 
-  const priorities = data?.priorities || [
+  const priorities = data?.priorities || (Array.isArray(data) ? data : [
     { rank: 1, zone_id: "Z03", priority_level: "CRITICAL", score: 96.5, target_location: "Station Road Sump N21", recommended_action: "Deploy High-Capacity Debris Pump & Clear Conduit E21", urgency_window_minutes: 15 },
     { rank: 2, zone_id: "Z01", priority_level: "CRITICAL", score: 88.2, target_location: "Central Commercial N21/N14", recommended_action: "Clear Drain Blockage at N21 Junction", urgency_window_minutes: 25 },
     { rank: 3, zone_id: "Z02", priority_level: "HIGH", score: 78.4, target_location: "North Market Culvert N14", recommended_action: "Inspect Culvert Intake & Issue Traffic Diversion", urgency_window_minutes: 40 },
     { rank: 4, zone_id: "Z05", priority_level: "HIGH", score: 72.0, target_location: "Hospital Access Corridor", recommended_action: "Deploy Flood Barriers to Protect Emergency Entrance", urgency_window_minutes: 30 }
-  ];
+  ]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>

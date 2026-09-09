@@ -20,22 +20,24 @@ export default function WhyFloodPanel({ selectedZoneId = 'Z03' }) {
 
   if (loading) return <LoadingState message="Computing multi-factor WHY-FLOOD attribution..." />;
 
-  const zoneExp = data?.explanations?.[0] || {
-    zone_id: selectedZoneId,
-    zone_name: "Station Road Corridor",
-    primary_cause: "Drainage Utilization Overflow + Low Elevation Sump",
-    factors: [
-      { factor_name: "Rainfall Intensity", weight: 0.35, description: "Extreme nowcast rate (86.4 mm/hr)" },
-      { factor_name: "Terrain Elevation", weight: 0.25, description: "Low depression sump area (4.2m elevation)" },
-      { factor_name: "Drainage Surcharge", weight: 0.40, description: "Conduit E21 utilization 122% at Node N21" }
-    ],
-    causal_chain: [
-      { step: 1, title: "Extreme Cloudburst Event", description: "Rainfall intensity reaches 86.4 mm/hr, overwhelming infiltration capacity", severity: "CRITICAL" },
-      { step: 2, title: "Surface Runoff Surge", description: "Catchment runoff volume surges to 22.1 m³/s into low-lying topographic sump", severity: "HIGH" },
-      { step: 3, title: "Conduit Surcharge & Backwater", description: "Node N21 sump capacity exceeded by 22%, driving hydraulic backwater", severity: "CRITICAL" },
-      { step: 4, title: "Street Inundation Onset", description: "Station Road surface depth reaches 47.5 cm (Impassable for vehicles)", severity: "SEVERE" }
-    ]
-  };
+  const zoneExp = (data?.explanations && data.explanations.length > 0)
+    ? data.explanations[0]
+    : (data?.zone_id ? data : {
+        zone_id: selectedZoneId,
+        zone_name: "Station Road Corridor",
+        primary_cause: "Drainage Utilization Overflow + Low Elevation Sump",
+        factors: [
+          { factor_name: "Rainfall Intensity", weight: 0.35, description: "Extreme nowcast rate (86.4 mm/hr)" },
+          { factor_name: "Terrain Elevation", weight: 0.25, description: "Low depression sump area (4.2m elevation)" },
+          { factor_name: "Drainage Surcharge", weight: 0.40, description: "Conduit E21 utilization 122% at Node N21" }
+        ],
+        causal_chain: [
+          { step: 1, title: "Extreme Cloudburst Event", description: "Rainfall intensity reaches 86.4 mm/hr, overwhelming infiltration capacity", severity: "CRITICAL" },
+          { step: 2, title: "Surface Runoff Surge", description: "Catchment runoff volume surges to 22.1 m³/s into low-lying topographic sump", severity: "HIGH" },
+          { step: 3, title: "Conduit Surcharge & Backwater", description: "Node N21 sump capacity exceeded by 22%, driving hydraulic backwater", severity: "CRITICAL" },
+          { step: 4, title: "Street Inundation Onset", description: "Station Road surface depth reaches 47.5 cm (Impassable for vehicles)", severity: "SEVERE" }
+        ]
+      });
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -63,7 +65,7 @@ export default function WhyFloodPanel({ selectedZoneId = 'Z03' }) {
           <StatusBadge status="ATTRIBUTED" />
         </div>
         <div className="causal-timeline">
-          {zoneExp.causal_chain.map((chain, idx) => (
+          {(zoneExp?.causal_chain || []).map((chain, idx) => (
             <React.Fragment key={chain.step}>
               <div className="causal-node-card">
                 <div className="step-num">{chain.step}</div>
@@ -75,7 +77,7 @@ export default function WhyFloodPanel({ selectedZoneId = 'Z03' }) {
                   <div className="step-desc">{chain.description}</div>
                 </div>
               </div>
-              {idx < zoneExp.causal_chain.length - 1 && (
+              {idx < (zoneExp?.causal_chain?.length || 0) - 1 && (
                 <div className="causal-arrow">↓</div>
               )}
             </React.Fragment>

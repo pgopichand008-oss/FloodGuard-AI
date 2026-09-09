@@ -20,16 +20,20 @@ export default function PropagationPanel({ selectedZoneId = 'Z03' }) {
 
   if (loading) return <LoadingState message="Tracing corridor flood propagation..." />;
 
-  const propagation = data || {
-    primary_source_zone_id: selectedZoneId,
-    corridor_sequence: ["N21 Sump", "Station Road", "Market Junction", "Bus Terminal", "Hospital Approach"],
-    affected_zones: [
-      { zone_id: "Z03", depth_cm: 47.5, arrival_offset_min: 0, transmission_mechanism: "Surcharge Sump Overflow" },
-      { zone_id: "Z01", depth_cm: 42.5, arrival_offset_min: 15, transmission_mechanism: "Surface Overland Runoff" },
-      { zone_id: "Z02", depth_cm: 38.0, arrival_offset_min: 30, transmission_mechanism: "Conduit Backwater Flow" },
-      { zone_id: "Z05", depth_cm: 6.0, arrival_offset_min: 60, transmission_mechanism: "Downstream Spillover" }
-    ]
-  };
+  const primarySourceId = data?.zone_id || data?.primary_source_zone_id || selectedZoneId;
+  const sequence = data?.propagation_path || data?.corridor_sequence || ["N21 Sump", "Station Road", "Market Junction", "Bus Terminal", "Hospital Approach"];
+  
+  const affectedZones = data?.propagation ? data.propagation.map(step => ({
+    zone_id: step.zone_id,
+    depth_cm: step.flood_depth_cm,
+    arrival_offset_min: (step.order || 1) * 15,
+    transmission_mechanism: step.mechanism || step.relationship
+  })) : (data?.affected_zones || [
+    { zone_id: "Z03", depth_cm: 47.5, arrival_offset_min: 0, transmission_mechanism: "Surcharge Sump Overflow" },
+    { zone_id: "Z01", depth_cm: 42.5, arrival_offset_min: 15, transmission_mechanism: "Surface Overland Runoff" },
+    { zone_id: "Z02", depth_cm: 38.0, arrival_offset_min: 30, transmission_mechanism: "Conduit Backwater Flow" },
+    { zone_id: "Z05", depth_cm: 6.0, arrival_offset_min: 60, transmission_mechanism: "Downstream Spillover" }
+  ]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -38,7 +42,7 @@ export default function PropagationPanel({ selectedZoneId = 'Z03' }) {
         <div>
           <div style={{ fontWeight: 800, color: 'var(--cyan-bright)' }}>CORRIDOR PROPAGATION TRAVERSAL</div>
           <div style={{ color: 'var(--text-muted)', fontSize: '0.68rem' }}>
-            Sequential transmission originating from <strong>{propagation.primary_source_zone_id}</strong> across connected urban corridors.
+            Sequential transmission originating from <strong>{primarySourceId}</strong> across connected urban corridors.
           </div>
         </div>
       </div>
@@ -46,15 +50,15 @@ export default function PropagationPanel({ selectedZoneId = 'Z03' }) {
       <div className="recharts-container-box">
         <div className="chart-header-row">
           <span>HYDRAULIC PROPAGATION SEQUENCE</span>
-          <span>{propagation.affected_zones.length} DOWNSTREAM ZONES</span>
+          <span>{(affectedZones || []).length} DOWNSTREAM ZONES</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', padding: '8px 0' }}>
-          {propagation.corridor_sequence.map((corridor, idx) => (
+          {(sequence || []).map((corridor, idx) => (
             <React.Fragment key={corridor}>
               <div style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', padding: '5px 9px', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-bright)' }}>
                 {corridor}
               </div>
-              {idx < propagation.corridor_sequence.length - 1 && (
+              {idx < (sequence?.length || 0) - 1 && (
                 <ArrowRight size={14} style={{ color: 'var(--cyan-bright)' }} />
               )}
             </React.Fragment>
@@ -63,7 +67,7 @@ export default function PropagationPanel({ selectedZoneId = 'Z03' }) {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        {propagation.affected_zones.map((zone) => (
+        {(affectedZones || []).map((zone) => (
           <div key={zone.zone_id} className="priority-card">
             <div className="priority-rank-badge">+{zone.arrival_offset_min}m</div>
             <div className="priority-card-main">

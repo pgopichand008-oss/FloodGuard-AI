@@ -4,21 +4,41 @@ import { fetchDrainageData } from '../../services/api';
 import LoadingState from '../common/LoadingState';
 import StatusBadge from '../common/StatusBadge';
 
-export default function DrainagePanel({ onClose }) {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+export default function DrainagePanel({ drainageData: initialDrainageData, onClose }) {
+  const [data, setData] = useState(initialDrainageData || null);
+  const [loading, setLoading] = useState(!initialDrainageData);
 
   useEffect(() => {
+    if (initialDrainageData) {
+      setData(initialDrainageData);
+      setLoading(false);
+      return;
+    }
+
     async function loadDrainage() {
       setLoading(true);
       const res = await fetchDrainageData();
-      setData(res.data);
+      if (res.data) {
+        setData(res.data);
+      }
       setLoading(false);
     }
     loadDrainage();
-  }, []);
+  }, [initialDrainageData]);
 
-  const nodes = data?.nodes || [
+  const nodes = data?.nodes ? data.nodes.map(n => {
+    const cap = n.outflow_capacity_m3s ?? n.capacity_m3_s ?? 15.0;
+    const flow = n.inflow_m3s ?? n.current_flow_m3_s ?? 18.4;
+    const util = n.utilization_pct !== undefined ? n.utilization_pct : (cap > 0 ? Math.round((flow / cap) * 1000) / 10 : 100);
+    return {
+      node_id: n.node_id,
+      name: n.name,
+      capacity_m3_s: cap,
+      current_flow_m3_s: flow,
+      status: n.status || (n.is_surcharged ? "SURCHARGED" : "NORMAL"),
+      utilization_pct: util
+    };
+  }) : [
     { node_id: "N21", name: "Station Junction Sump", capacity_m3_s: 15.0, current_flow_m3_s: 18.4, status: "SURCHARGED", utilization_pct: 122.6 },
     { node_id: "N14", name: "North Market Culvert", capacity_m3_s: 12.0, current_flow_m3_s: 13.5, status: "CRITICAL", utilization_pct: 112.5 },
     { node_id: "N01", name: "Hospital Outfall Sump", capacity_m3_s: 25.0, current_flow_m3_s: 8.0, status: "NORMAL", utilization_pct: 32.0 }

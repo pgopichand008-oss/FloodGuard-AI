@@ -15,9 +15,15 @@ export default function SafeRoutePanel() {
     if (e) e.preventDefault();
     setLoading(true);
     const res = await computeRoute({ origin, destination, emergency });
-    setRouteResult(res.data);
+    if (res.data) {
+      setRouteResult(res.data);
+    }
     setLoading(false);
   };
+
+  React.useEffect(() => {
+    handleComputeRoute();
+  }, []);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>

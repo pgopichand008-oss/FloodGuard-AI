@@ -5,13 +5,15 @@ import StatusBadge from '../common/StatusBadge';
 export default function RouteComparison({ routeData }) {
   if (!routeData) return null;
 
+  const summary = routeData.route_summary || {};
+  
   const rec = routeData.recommended_route || {
-    name: "Highland Elevated Bypass (Route B)",
-    travel_time_minutes: 16,
-    distance_km: 4.8,
-    max_depth_cm: 6.0,
-    risk_level: "LOW",
-    description: "100% safe for all vehicles. Completely bypasses Station Road Sump (N21)."
+    name: summary.recommended_route_name || (routeData.route_names ? routeData.route_names.join(' ➔ ') : "Highland Elevated Bypass (Route B)"),
+    travel_time_minutes: summary.travel_time_minutes ?? (routeData.total_distance_m ? Math.round((routeData.total_distance_m / 1000) * 3.3) : 16),
+    distance_km: summary.distance_km ?? (routeData.total_distance_m ? Math.round((routeData.total_distance_m / 1000) * 10) / 10 : 4.8),
+    max_depth_cm: summary.max_flood_depth_cm ?? routeData.max_flood_depth_cm ?? 6.0,
+    risk_level: summary.hazard_risk_level || routeData.flood_risk || "LOW",
+    description: routeData.reason || "100% safe for all vehicles. Completely bypasses Station Road Sump (N21)."
   };
 
   const alt = (routeData.alternative_routes && routeData.alternative_routes[0]) || {
@@ -20,7 +22,9 @@ export default function RouteComparison({ routeData }) {
     distance_km: 3.2,
     max_depth_cm: 47.5,
     risk_level: "CRITICAL",
-    description: "UNSAFE: Crosses 47.5 cm flood waters at N21 Sump. High risk of vehicle engine stall."
+    description: routeData.unsafe_segments_avoided && routeData.unsafe_segments_avoided.length > 0
+      ? `UNSAFE: Avoids flooded sectors (${routeData.unsafe_segments_avoided.join(', ')}). High risk of engine stall.`
+      : "UNSAFE: Crosses 47.5 cm flood waters at N21 Sump. High risk of vehicle engine stall."
   };
 
   return (

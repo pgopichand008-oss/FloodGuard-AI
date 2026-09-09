@@ -16,6 +16,8 @@ export default function WhatIfPanel({ onClose }) {
     setLoading(true);
 
     const payload = {
+      rainfall_mm_hr: Number(rainfallOverride),
+      blockage_percent: Number(blockagePct),
       baseline_rainfall_mm_hr: 86.4,
       scenario_rainfall_mm_hr: Number(rainfallOverride),
       drainage_blockage_pct: Number(blockagePct),
@@ -114,46 +116,61 @@ export default function WhatIfPanel({ onClose }) {
           {loading && <LoadingState message="Executing scenario simulation against hydrodynamic model..." />}
 
           {/* Simulation Results Output */}
-          {result && !loading && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <div className="sim-output-card">
-                <div className="output-metric">
-                  <span className="lbl">Baseline Rainfall</span>
-                  <span className="val">{result.baseline_rainfall_mm_hr} mm/hr</span>
-                </div>
-                <span className="output-divider">➔</span>
-                <div className="output-metric">
-                  <span className="lbl">Simulated Scenario</span>
-                  <span className="val" style={{ color: 'var(--cyan-bright)' }}>{result.scenario_rainfall_mm_hr} mm/hr</span>
-                </div>
-                <span className="output-divider">|</span>
-                <div className="output-metric">
-                  <span className="lbl">Worsened Zones</span>
-                  <span className="val" style={{ color: 'var(--crimson-bright)' }}>{result.overall_summary?.zones_worsened || 0}</span>
-                </div>
-                <div className="output-metric">
-                  <span className="lbl">Improved Zones</span>
-                  <span className="val" style={{ color: 'var(--emerald-bright)' }}>{result.overall_summary?.zones_improved || 0}</span>
-                </div>
-              </div>
+          {result && !loading && (() => {
+            const summary = result.summary || result.overall_summary || {};
+            const simList = result.results ? result.results.map(z => ({
+              zone_id: z.zone_id,
+              zone_name: z.name || z.zone_name,
+              baseline_depth_cm: z.baseline_flood_depth_cm ?? z.baseline_depth_cm ?? 0,
+              simulated_depth_cm: z.simulated_flood_depth_cm ?? z.simulated_depth_cm ?? 0,
+              depth_delta_cm: z.depth_change_cm ?? z.depth_delta_cm ?? 0,
+              simulated_risk: z.simulated_risk_level || z.simulated_risk || 'LOW'
+            })) : (result.zone_simulations || []);
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                {result.zone_simulations.map((z) => (
-                  <div key={z.zone_id} className="priority-card" style={{ padding: '8px 12px' }}>
-                    <div className="priority-card-main">
-                      <div className="priority-top-row">
-                        <span className="priority-target">Zone {z.zone_id}: {z.zone_name}</span>
-                        <StatusBadge status={z.simulated_risk} />
-                      </div>
-                      <div className="priority-issue">
-                        Baseline: <strong>{z.baseline_depth_cm} cm</strong> ➔ Simulated: <strong>{z.simulated_depth_cm} cm</strong> (Delta: <strong style={{ color: z.depth_delta_cm > 0 ? 'var(--crimson-bright)' : 'var(--emerald-bright)' }}>{z.depth_delta_cm > 0 ? `+${z.depth_delta_cm}` : z.depth_delta_cm} cm</strong>)
+            const baseRain = result.parameters_applied?.rainfall_mm_hr ?? result.baseline_rainfall_mm_hr ?? 86.4;
+            const simRain = result.parameters_applied?.rainfall_mm_hr ?? result.scenario_rainfall_mm_hr ?? rainfallOverride;
+
+            return (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div className="sim-output-card">
+                  <div className="output-metric">
+                    <span className="lbl">Baseline Rainfall</span>
+                    <span className="val">{baseRain} mm/hr</span>
+                  </div>
+                  <span className="output-divider">➔</span>
+                  <div className="output-metric">
+                    <span className="lbl">Simulated Scenario</span>
+                    <span className="val" style={{ color: 'var(--cyan-bright)' }}>{simRain} mm/hr</span>
+                  </div>
+                  <span className="output-divider">|</span>
+                  <div className="output-metric">
+                    <span className="lbl">Worsened Zones</span>
+                    <span className="val" style={{ color: 'var(--crimson-bright)' }}>{summary.zones_worsened || 0}</span>
+                  </div>
+                  <div className="output-metric">
+                    <span className="lbl">Improved Zones</span>
+                    <span className="val" style={{ color: 'var(--emerald-bright)' }}>{summary.zones_improved || 0}</span>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  {simList.map((z) => (
+                    <div key={z.zone_id} className="priority-card" style={{ padding: '8px 12px' }}>
+                      <div className="priority-card-main">
+                        <div className="priority-top-row">
+                          <span className="priority-target">Zone {z.zone_id}: {z.zone_name}</span>
+                          <StatusBadge status={z.simulated_risk} />
+                        </div>
+                        <div className="priority-issue">
+                          Baseline: <strong>{z.baseline_depth_cm} cm</strong> ➔ Simulated: <strong>{z.simulated_depth_cm} cm</strong> (Delta: <strong style={{ color: z.depth_delta_cm > 0 ? 'var(--crimson-bright)' : 'var(--emerald-bright)' }}>{z.depth_delta_cm > 0 ? `+${z.depth_delta_cm}` : z.depth_delta_cm} cm</strong>)
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
         </div>
       </div>
     </div>
