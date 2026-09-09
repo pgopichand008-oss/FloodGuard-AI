@@ -159,7 +159,9 @@ class DrainageEngine:
             downstream_nodes=downstream,
         )
 
-    def evaluate_node_metrics(self, node_id: str) -> DrainageNodeModel:
+    def evaluate_node_metrics(
+        self, node_id: str, blockage_override: Optional[float] = None
+    ) -> DrainageNodeModel:
         """Calculates inflow, outflow capacity, and surcharge state for a junction node."""
         g = self.build_graph()
         if node_id not in g:
@@ -181,8 +183,13 @@ class DrainageEngine:
         if out_edges:
             for v in out_edges:
                 e_attr = g.edges[node_id, v]
+                edge_blockage = (
+                    float(blockage_override)
+                    if blockage_override is not None
+                    else float(e_attr["blockage_percent"])
+                )
                 eff_cap = self.calculate_effective_capacity(
-                    e_attr["capacity_m3s"], e_attr["blockage_percent"]
+                    e_attr["capacity_m3s"], edge_blockage
                 )
                 outflow_cap += eff_cap
                 util = self.calculate_utilization(e_attr["current_flow_m3s"], eff_cap)
@@ -216,7 +223,9 @@ class DrainageEngine:
             is_surcharged=is_surcharged,
         )
 
-    def evaluate_entire_network(self) -> DrainageNetworkResponse:
+    def evaluate_entire_network(
+        self, blockage_override: Optional[float] = None
+    ) -> DrainageNetworkResponse:
         """Executes full dynamic hydraulic evaluation across all nodes and edges."""
         dataset = self.service.load_dataset()
         g = self.build_graph()
@@ -234,7 +243,7 @@ class DrainageEngine:
         bottlenecks: List[str] = []
 
         for edge_id in self._edge_lookup:
-            metrics = self.evaluate_edge_metrics(edge_id)
+            metrics = self.evaluate_edge_metrics(edge_id, blockage_override=blockage_override)
             evaluated_edges.append(metrics)
 
             total_design_cap += metrics.capacity_m3s
@@ -256,7 +265,7 @@ class DrainageEngine:
 
         evaluated_nodes: List[DrainageNodeModel] = []
         for n in g.nodes:
-            node_model = self.evaluate_node_metrics(n)
+            node_model = self.evaluate_node_metrics(n, blockage_override=blockage_override)
             evaluated_nodes.append(node_model)
 
         summary = DrainageNetworkSummary(

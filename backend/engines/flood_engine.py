@@ -216,6 +216,7 @@ class FloodEngine:
     def generate_flood_prediction(
         self,
         rainfall_override_mm_hr: Optional[float] = None,
+        blockage_override_percent: Optional[float] = None,
         zone_id: Optional[str] = None,
         risk_level_filter: Optional[FloodRiskLevel] = None,
     ) -> FloodPredictionResponse:
@@ -234,7 +235,9 @@ class FloodEngine:
         all_zones = self.terrain_engine.terrain_service.get_all_zones()
 
         # 3. Fetch drainage network evaluation
-        drainage_resp = self.drainage_engine.evaluate_entire_network()
+        drainage_resp = self.drainage_engine.evaluate_entire_network(
+            blockage_override=blockage_override_percent
+        )
         drainage_nodes_map = {n.node_id: n for n in drainage_resp.nodes}
         drainage_edges_map = {e.edge_id: e for e in drainage_resp.drains}
 

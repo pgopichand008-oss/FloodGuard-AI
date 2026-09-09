@@ -22,6 +22,7 @@ class FloodService:
     def get_predictions(
         self,
         rainfall_override_mm_hr: Optional[float] = None,
+        blockage_override_percent: Optional[float] = None,
         zone_id: Optional[str] = None,
         risk_level_filter: Optional[str] = None,
     ) -> FloodPredictionResponse:
@@ -37,6 +38,7 @@ class FloodService:
 
         return self.flood_engine.generate_flood_prediction(
             rainfall_override_mm_hr=rainfall_override_mm_hr,
+            blockage_override_percent=blockage_override_percent,
             zone_id=zone_id,
             risk_level_filter=risk_enum,
         )
