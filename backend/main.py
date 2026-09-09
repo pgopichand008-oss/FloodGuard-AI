@@ -10,6 +10,7 @@ from backend.api import (
     priorities,
     propagation,
     rainfall,
+    routing,
     simulation,
     terrain,
 )
@@ -40,6 +41,7 @@ app.include_router(explanations.router, prefix="/api")
 app.include_router(simulation.router, prefix="/api")
 app.include_router(priorities.router, prefix="/api")
 app.include_router(propagation.router, prefix="/api")
+app.include_router(routing.router, prefix="/api")
 
 
 @app.get("/")
